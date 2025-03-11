@@ -22,14 +22,24 @@ class CDTWResults:
         self.train_data = pd.read_csv(file_path_train)
         # remove the '.' in label names, i.e. .1 and .2 and so on from column names, EKG data has this and Beef
         self.train_data.columns = self.train_data.columns.str.split('.').str[0]
-        self.classification_labels = self.train_data.columns.unique() # this gets used for dtw_results_EKG_only, so becareful not to change these
+        self.classification_labels = self.train_data.columns.unique() # used for everthing now, this gets used for dtw_results_EKG_only, so becareful not to change these
         self.num_classes = len(self.classification_labels)
         print(f"Number of classes: {self.num_classes}")
         print(f"Loaded training matrix with shape: {self.train_data.shape}")
         print("Number of training signals: ", self.train_data.shape[1])
-        self.num_class_each = self.train_data.columns.value_counts().values
+        
+        self.num_class_each = [sum(self.train_data.columns == i) for i in self.classification_labels]
+        print("Number of training signals per class: ", [int(x) for x in self.num_class_each])
+        #self.num_class_each = self.train_data.columns.value_counts().values
+        
         print("Training labels: ", self.classification_labels)
-        print("Number of training signals per class: ", self.num_class_each)
+        # print the number of training signals per class
+        print("Number of training signals for class 1: ", self.num_class_each[0])
+        print("Number of training signals for class 2: ", self.num_class_each[1])
+        print("Number of training signals for class 3: ", self.num_class_each[2])
+        print("Number of training signals for class 4: ", self.num_class_each[3])
+
+        #print("Number of training signals per class: ", self.num_class_each)
         """
         # Load test data
         self.test_data = pd.read_csv(file_path_test)
@@ -148,4 +158,14 @@ classifier = CDTWResults(beef_train_data_path)
 NN_min_A, NN_matrix_A = classifier.shape_change(path_test, path_results)
 A_acc = classifier.accuracy(0, NN_matrix_A)
 print(f"Accuracy for Beef1: {A_acc}")"
+"""
+"""
+# Take in .tsv file and return a numpy array
+CinCECGTorso_train_path = "/Users/vickyhaney/Documents/GAship/DrBruno/EKG/UCRArchive_data/CinCECGTorso/CinCECGTorso_train_matrix.csv"
+CinCECGTorso1_resutls = "/Users/vickyhaney/Documents/GAship/DrBruno/EKG/UCRArchive_results/CinCECGTorso/CinCECGTorso1CinCECGTorso_dist_obj.csv"
+CinCECGTorso1_test_path = "/Users/vickyhaney/Documents/GAship/DrBruno/EKG/UCRArchive_data/CinCECGTorso/CinCECGTorso1_test_matrix.csv"
+classifier = CDTWResults(CinCECGTorso_train_path)
+NN_min_A, NN_matrix_A = classifier.shape_change(CinCECGTorso1_test_path, CinCECGTorso1_resutls)
+A_acc = classifier.accuracy(0, NN_matrix_A)
+print(f"Accuracy for CinCECGTorso1: {A_acc}")
 """
