@@ -34,10 +34,10 @@ class CDTWResults:
         
         print("Training labels: ", self.classification_labels)
         # print the number of training signals per class
-        print("Number of training signals for class 1: ", self.num_class_each[0])
-        print("Number of training signals for class 2: ", self.num_class_each[1])
-        print("Number of training signals for class 3: ", self.num_class_each[2])
-        print("Number of training signals for class 4: ", self.num_class_each[3])
+        #print("Number of training signals for class 1: ", self.num_class_each[0])
+        #print("Number of training signals for class 2: ", self.num_class_each[1])
+        #print("Number of training signals for class 3: ", self.num_class_each[2])
+        #print("Number of training signals for class 4: ", self.num_class_each[3])
 
         #print("Number of training signals per class: ", self.num_class_each)
         """
@@ -84,15 +84,43 @@ class CDTWResults:
 
         NN_min = []
         chunk = self.train_data.shape[1]    # number of training signals
-        #print("chunk: ", chunk)
+        print("chunk: ", chunk)
         test_length = self.test_data.shape[1] # number of test signals
-        #print("test_length: ", test_length)
+        print("test_length: ", test_length)
 
         for i in range(test_length):
             array = self.results_data[:, i * chunk:(i + 1) * chunk] # choose a chunk of the results data
-            #print(f"array shape: {array.shape}")
-            for ind, num in enumerate(self.num_class_each): #take min every num
-                NN_min.append(np.min(array[:, ind * num:(ind + 1) * num]))
+            print(f"array shape: {array.shape}")
+
+            start_idx = 0
+            for num in self.num_class_each:
+                seg = array[:, start_idx:start_idx + num] # take a segment of the array
+                print(f"seg shape: {seg.shape}")
+                seg_min = np.min(seg)
+                print(f"seg_min: {seg_min}")
+                NN_min.append(seg_min)
+                start_idx += num
+
+                
+         
+        """
+            first_seg = array[:, 0:self.num_class_each[0]] # first segment of the array
+            print(f"first_seg shape: {first_seg.shape}")
+            first_seg_min = np.min(first_seg) # take the min of the first segment
+            print(f"first_seg_min: {first_seg_min}")
+            NN_min.append(first_seg_min)
+
+            second_seg = array[:, self.num_class_each[0]:chunk] # second segment of the array
+            print(f"second_seg shape: {second_seg.shape}")
+            second_seg_min = np.min(second_seg) # take the min of the second segment
+            print(f"second_seg_min: {second_seg_min}")
+            NN_min.append(second_seg_min)
+            print(f"length NN_min: {len(NN_min)}")
+        """
+            #for ind, num in enumerate(self.num_class_each): #take min every num of training signals
+            #    print(f"ind: {ind}, num: {num}")
+            #    print(f"ind * num: {ind * num}, (ind + 1) * num: {(ind + 1) * num}")
+            #    NN_min.append(np.min(array[:, ind * num:(ind + 1) * num]))
 
         print(f"Length of NN_min: {len(NN_min)}, should be {self.test_data.shape[1] * self.num_classes}")
 
@@ -120,6 +148,7 @@ class CDTWResults:
         Returns:
             accuracy (float): The accuracy of the classification.
         """
+        print("NN_matrix: ", NN_matrix[0:5, 0:5])
         d = NN_matrix.shape[1]
         # get the index of the min value in each column
         #print(NN_matrix)
@@ -128,6 +157,7 @@ class CDTWResults:
         # get the number of correct classifications
         accuracy = float(np.sum(matrix_index == class_index) / d)
         accuracy = round(accuracy, 4)
+        print(f"Accuracy of classification for class {class_index} is {accuracy:.4f}")
 
 
         return accuracy
